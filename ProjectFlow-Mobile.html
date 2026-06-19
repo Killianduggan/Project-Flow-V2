@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#37675A">
+<title>Project Flow — Mobile</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{
+  --fpk-dark:#37675A; --fpk-mid:#5DAE55; --fpk-light:#B1D095;
+  --grey-bg:#F2F2F2; --grey-border:#D9D9D9; --amber:#E8A33D; --red:#C0392B; --blue:#2E6F8E; --notstarted:#8A8A8A; --shadow:0 2px 8px rgba(0,0,0,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Calibri,'Segoe UI',Roboto,Arial,sans-serif;font-size:16px;color:#111;background:var(--grey-bg);display:flex;flex-direction:column}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px;padding:10px;border:1px solid var(--grey-border);border-radius:7px;background:#fff;width:100%}
+textarea{min-height:90px;resize:vertical}
+h1,h2{color:var(--fpk-dark)}
+
+/* header */
+#hdr{background:var(--fpk-dark);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px;flex:0 0 auto}
+#hdr .logo{width:30px;height:30px;background:#fff;color:var(--fpk-dark);font-weight:bold;font-size:11px;display:flex;align-items:center;justify-content:center;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);flex:0 0 auto}
+#projPick{flex:1;font-weight:bold;color:var(--fpk-dark);background:#fff;border-radius:7px;max-width:none}
+#hdr .ic{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;border-radius:7px;padding:7px 10px;flex:0 0 auto}
+#saveTag{font-size:11px;color:var(--fpk-light);position:fixed;right:8px;bottom:8px;background:rgba(55,103,90,.9);color:#fff;padding:3px 9px;border-radius:10px;display:none;z-index:60}
+
+/* tabs */
+#tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--grey-border);flex:0 0 auto;-webkit-overflow-scrolling:touch}
+#tabs button{border:none;background:none;padding:11px 14px;font-size:14px;font-weight:bold;color:#666;white-space:nowrap;border-bottom:3px solid transparent}
+#tabs button.active{color:var(--fpk-dark);border-bottom-color:var(--fpk-mid)}
+.badge{background:var(--fpk-mid);color:#fff;border-radius:10px;font-size:11px;padding:0 6px;margin-left:4px}
+.badge.r{background:var(--red)} .badge.a{background:var(--amber);color:#000}
+
+/* views */
+#views{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.view{display:none;padding:12px}
+.view.active{display:block}
+.vhead{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.vhead h2{font-size:19px;flex:1}
+.btn{background:var(--fpk-mid);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:15px;font-weight:bold}
+.btn.sec{background:#fff;color:var(--fpk-dark);border:1px solid var(--grey-border)}
+.btn.block{display:block;width:100%}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.ctrl select,.ctrl input{width:auto;flex:1;min-width:120px}
+.hint{font-size:12px;color:#777}
+
+/* deliverables */
+.lateBanner{background:#fdecea;border:1px solid var(--red);border-left:5px solid var(--red);border-radius:7px;padding:9px 12px;margin-bottom:12px}
+.lateBanner h4{color:var(--red);font-size:14px;margin-bottom:4px}
+.lateBanner .li{font-size:13px;margin:3px 0;color:#7a241b}
+.msG{margin-bottom:18px}
+.msGh{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--fpk-dark);padding-bottom:4px;margin-bottom:6px}
+.msGh .nm{font-weight:bold;color:var(--fpk-dark);font-size:16px;flex:1}
+.msGh .dt{font-size:12px;color:#fff;background:var(--fpk-dark);border-radius:10px;padding:2px 9px}
+.msGh .dt.past{background:var(--red)} .msGh .dt.soon{background:var(--amber);color:#000}
+.catSub{font-size:11px;font-weight:bold;color:#fff;border-radius:8px;padding:2px 9px;display:inline-block;margin:8px 0 5px}
+.card{background:#fff;border:1px solid var(--grey-border);border-left:5px solid var(--fpk-mid);border-radius:7px;padding:10px 12px;margin-bottom:7px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.card .mn{flex:1;min-width:0}
+.card .tt{font-weight:bold;font-size:15px}
+.card .ds{font-size:13px;color:#555;margin-top:2px;white-space:pre-wrap}
+.card .meta{font-size:12px;color:#666;margin-top:3px}
+.pill{font-size:11px;font-weight:bold;color:#fff;border-radius:13px;padding:5px 11px;white-space:nowrap;border:none}
+.pill.notstarted{background:var(--notstarted)} .pill.inprogress{background:var(--amber);color:#000} .pill.complete{background:var(--fpk-mid)}
+.lateTag{background:var(--red);color:#fff;font-size:9px;font-weight:bold;border-radius:6px;padding:1px 5px;vertical-align:middle}
+.statusChip{font-size:11px;font-weight:bold;border-radius:8px;padding:2px 8px;color:#fff;white-space:nowrap}
+.sOpen{background:var(--fpk-dark)} .sProg{background:var(--amber);color:#000} .sClosed{background:var(--notstarted)}
+.rTag{font-size:10px;font-weight:bold;color:#fff;border-radius:8px;padding:1px 7px;margin:0 3px 3px 0;display:inline-block}
+.empty{color:#888;font-size:14px;padding:14px 2px}
+.projHd{font-size:16px;color:var(--fpk-dark);font-weight:bold;margin:10px 0 6px;border-bottom:1px solid var(--grey-border);padding-bottom:3px}
+
+/* dashboard */
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.dc{background:#fff;box-shadow:var(--shadow);border-top:4px solid var(--fpk-mid);padding:12px;border-radius:7px}
+.dc.red{border-top-color:var(--red)} .dc.amber{border-top-color:var(--amber)} .dc.dark{border-top-color:var(--fpk-dark)}
+.dc .n{font-size:28px;font-weight:bold;color:var(--fpk-dark)} .dc .l{font-size:12px;color:#555;margin-top:3px}
+.due{font-size:11px;font-weight:bold;border-radius:8px;padding:2px 7px}
+.dueOver{background:var(--red);color:#fff} .dueToday{background:var(--amber);color:#000} .dueSoon{background:var(--grey-bg);color:#333;border:1px solid var(--grey-border)}
+
+/* calendar (compact linear per project) */
+.calRow{background:#fff;border:1px solid var(--grey-border);border-radius:7px;padding:8px 10px;margin-bottom:6px;box-shadow:var(--shadow)}
+.calRow .cm{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:4px 0;border-bottom:1px solid var(--grey-bg)}
+.calRow .cm:last-child{border-bottom:none}
+.calRow .cm.passed .d{color:var(--red);font-weight:bold}
+
+/* modal / form sheet */
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:80;align-items:flex-end}
+#sheet.open{display:flex}
+#sheetCard{background:#fff;width:100%;max-height:94%;overflow:auto;border-radius:14px 14px 0 0}
+#sheetCard h3{background:var(--fpk-dark);color:#fff;padding:13px 16px;font-size:17px;position:sticky;top:0;display:flex;justify-content:space-between;align-items:center}
+#sheetCard h3 button{background:none;border:none;color:#fff;font-size:20px}
+#sheetBody{padding:14px 16px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:13px;font-weight:bold;color:var(--fpk-dark);margin-bottom:4px}
+.fld .row2{display:flex;gap:10px}
+.seg{display:flex;gap:0;border:1px solid var(--grey-border);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:none;background:#fff;padding:10px;font-size:14px;font-weight:bold;color:#555}
+.seg button.on{background:var(--fpk-mid);color:#fff}
+#sheetFoot{padding:12px 16px;border-top:1px solid var(--grey-border);display:flex;gap:10px}
+.tagChecks{display:flex;flex-wrap:wrap;gap:8px} .tagChecks label{font-size:14px;display:flex;gap:5px;align-items:center;font-weight:normal;width:auto}
+.swRow{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:7px;border:2px solid var(--grey-border)}
+.sw.on{border-color:var(--fpk-dark);outline:2px solid var(--fpk-mid)}
+
+/* setup + toast */
+#setup{flex:1;overflow:auto;padding:22px 18px;display:none}
+#setup.show{display:block}
+#setup h1{font-size:22px;margin-bottom:6px}
+#setup .box{background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:16px;margin-top:14px}
+#toast{position:fixed;bottom:54px;left:50%;transform:translateX(-50%);background:var(--fpk-dark);color:#fff;padding:10px 18px;border-radius:22px;font-size:14px;display:none;z-index:99;box-shadow:var(--shadow);max-width:92%;text-align:center}
+.spin{display:none;position:fixed;inset:0;background:rgba(255,255,255,.6);z-index:90;align-items:center;justify-content:center;font-weight:bold;color:var(--fpk-dark)}
+.spin.on{display:flex}
+</style>
+</head>
+<body>
+
+<!-- SETUP (first run / not signed in) -->
+<div id="setup" class="show">
+  <h1>Project Flow — Mobile</h1>
+  <div class="hint">Companion for the desktop board. Reads &amp; writes the same projects from Google Drive.</div>
+  <div class="box">
+    <div class="fld"><label>Google OAuth Client ID</label><input id="cfgClient" placeholder="xxxxx.apps.googleusercontent.com"></div>
+    <div class="fld"><label>Portfolio folder name (in your Drive)</label><input id="cfgPortfolio" placeholder="ProjectFlow"></div>
+    <button class="btn block" id="btnSaveCfg">Save settings</button>
+    <div class="hint" style="margin-top:8px">One-time setup. See the setup guide for how to create the Client ID.</div>
+  </div>
+  <div class="box">
+    <button class="btn block" id="btnSignIn">Sign in with Google</button>
+    <div class="hint" id="signInHint" style="margin-top:8px">Enter settings above first.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="hdr" style="display:none">
+  <div class="logo">FPK</div>
+  <select id="projPick"></select>
+  <button class="ic" id="btnRefresh" title="Reload from Drive">⟳</button>
+  <button class="ic" id="btnMenu" title="Sign out / settings">⋯</button>
+</div>
+<div id="tabs" style="display:none">
+  <button data-tab="deliv" class="active">Deliverables</button>
+  <button data-tab="calendar">Calendar</button>
+  <button data-tab="dash">Dashboard</button>
+  <button data-tab="actions">Actions <span class="badge" id="bAct">0</span></button>
+  <button data-tab="risks">Risks <span class="badge r" id="bRisk">0</span></button>
+  <button data-tab="rfis">RFIs <span class="badge a" id="bRfi">0</span></button>
+  <button data-tab="minutes">Minutes</button>
+  <button data-tab="notes">Notice</button>
+</div>
+<div id="views" style="display:none">
+  <div class="view active" id="v-deliv"></div>
+  <div class="view" id="v-calendar"></div>
+  <div class="view" id="v-dash"></div>
+  <div class="view" id="v-actions"></div>
+  <div class="view" id="v-risks"></div>
+  <div class="view" id="v-rfis"></div>
+  <div class="view" id="v-minutes"></div>
+  <div class="view" id="v-notes"></div>
+</div>
+
+<!-- form sheet -->
+<div id="sheet"><div id="sheetCard">
+  <h3><span id="sheetTitle">Edit</span><button id="sheetClose">✕</button></h3>
+  <div id="sheetBody"></div>
+  <div id="sheetFoot"></div>
+</div></div>
+
+<div id="toast"></div>
+<div class="spin" id="spin">Working…</div>
+<div id="saveTag">saved</div>
+
+<script>
+"use strict";
+/* ============================================================
+   PROJECT FLOW — MOBILE COMPANION (Google Drive backed)
+   Reads/writes the same project.json as the desktop app.
+   ============================================================ */
+/* ---------------- config ---------------- */
+let CLIENT_ID=localStorage.getItem('pf_clientId')||'';
+let PORTFOLIO_NAME=localStorage.getItem('pf_portfolio')||'ProjectFlow';
+
+/* ---------------- utilities ---------------- */
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function fmtD(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}.${m}.${y.slice(2)}`; }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.display='none',2800); }
+function spin(on){ $('spin').classList.toggle('on',!!on); }
+function savedFlash(){ const s=$('saveTag'); s.style.display='block'; clearTimeout(savedFlash._t); savedFlash._t=setTimeout(()=>s.style.display='none',1500); }
+
+/* ---------------- data model (matches desktop V2) ---------------- */
+const DSTATUS={ notstarted:{label:'Not started',cls:'notstarted'}, inprogress:{label:'In progress',cls:'inprogress'}, complete:{label:'Complete',cls:'complete'} };
+const STATUS_ORDER=['notstarted','inprogress','complete'];
+const RISK_TAGS=[['Schedule','#2E6F8E'],['Financial','#8E5A2E'],['H&S','#C0392B'],['Environmental','#5DAE55'],['Performance','#6B5B95'],['Quality','#37675A'],['Resources','#E8A33D'],['Other','#8A8A8A']];
+const riskTagColor=t=>{ const f=RISK_TAGS.find(x=>x[0]===t); return f?f[1]:'#8A8A8A'; };
+const NOTE_COLORS=['#FFF7C2','#DFF0D8','#D9EDF7','#FCE4EC','#EAD9F7','#F2F2F2'];
+function newProject(){ return {app:'ProjectFlow',schema:2,meta:{name:'',user:'',created:todayISO(),isTemplate:false},categories:[],milestones:[],deliverables:[],risks:[],rfis:[],notes:[],labels:[],actions:[],minutes:[],changeLog:[]}; }
+function migrateProject(data){
+  const s=newProject(); s.meta=Object.assign(s.meta,data.meta||{}); if(typeof s.meta.isTemplate!=='boolean') s.meta.isTemplate=false;
+  s.categories=(data.categories&&data.categories.length)?data.categories:[]; s.milestones=data.milestones||[];
+  s.risks=data.risks||[]; s.rfis=data.rfis||[]; s.actions=data.actions||[]; s.minutes=data.minutes||[]; s.changeLog=data.changeLog||[]; s.labels=data.labels||[];
+  s.notes=(data.notes||[]).map(n=>Object.assign({kind:'note'},n));
+  if(Array.isArray(data.deliverables)){ s.deliverables=data.deliverables.map(d=>({id:d.id||uid(),title:d.title||'',desc:d.desc||'',catId:d.catId||'',msId:d.msId||'',status:STATUS_ORDER.includes(d.status)?d.status:'notstarted',completedDate:d.completedDate||'',delivId:undefined})); }
+  else if(Array.isArray(data.tiles)){ s.deliverables=data.tiles.map(t=>{ const p=+t.pct||0; return {id:t.id||uid(),title:t.title||'',desc:t.desc||'',catId:t.catId||'',msId:t.msId||'',status:p>=100?'complete':(p>0?'inprogress':'notstarted'),completedDate:t.completedDate||(p>=100?todayISO():'')}; }); }
+  return s;
+}
+function userName(){ return state.meta.user||'Mobile'; }
+function statusOf(d){ return DSTATUS[d.status]||DSTATUS.notstarted; }
+function sortedMilestones(s){ return (s.milestones||[]).filter(m=>m.date).slice().sort((a,b)=>a.date<b.date?-1:1); }
+function nextMilestoneDate(s){ const t=todayISO(); const up=sortedMilestones(s).find(m=>m.date>=t); return up?up.date:null; }
+function closestMilestone(s){ const ms=(s.milestones||[]).filter(m=>m.date); if(!ms.length) return ''; const t=todayISO(); let b=ms[0],bd=Math.abs(daysBetween(t,ms[0].date)); ms.forEach(m=>{ const d=Math.abs(daysBetween(t,m.date)); if(d<bd){bd=d;b=m;} }); return b.id; }
+function msById(s,id){ return (s.milestones||[]).find(m=>m.id===id)||null; }
+function actionSeq(){ let m=0; state.actions.forEach(a=>{const n=parseInt((a.id||'').replace('AC-',''),10); if(n>m)m=n;}); return 'AC-'+String(m+1).padStart(3,'0'); }
+function riskSeq(){ let m=0;(state.risks||[]).forEach(r=>{const n=parseInt((r.id||'').replace('R-',''),10); if(n>m)m=n;}); return 'R-'+String(m+1).padStart(3,'0'); }
+function rfiSeq(){ let m=0;(state.rfis||[]).forEach(r=>{const n=parseInt((r.id||'').replace('RFI-',''),10); if(n>m)m=n;}); return 'RFI-'+String(m+1).padStart(3,'0'); }
+function logChange(d){ state.changeLog=state.changeLog||[]; state.changeLog.unshift({t:new Date().toISOString().slice(0,16).replace('T',' '),u:userName(),d}); if(state.changeLog.length>200) state.changeLog.length=200; }
+
+/* ---------------- app state ---------------- */
+let state=newProject();
+let projects=[], portfolioId=null, activeProj=null, loadedModifiedTime=null;
+
+/* ============================================================
+   GOOGLE AUTH (GIS token client)
+   ============================================================ */
+let tokenClient=null, accessToken=null, tokenResolve=null;
+function ensureTokenClient(){
+  if(tokenClient) return;
+  tokenClient=google.accounts.oauth2.initTokenClient({ client_id:CLIENT_ID, scope:'https://www.googleapis.com/auth/drive',
+    callback:resp=>{ if(resp&&resp.access_token){ accessToken=resp.access_token; } if(tokenResolve){ tokenResolve(!!(resp&&resp.access_token)); tokenResolve=null; } } });
+}
+function requestToken(interactive){ return new Promise(res=>{ ensureTokenClient(); tokenResolve=res; try{ tokenClient.requestAccessToken({prompt:interactive?'consent':''}); }catch(e){ res(false); } }); }
+async function signIn(){
+  if(!window.google||!google.accounts||!google.accounts.oauth2){ toast('Google sign-in still loading — try again in a moment'); return; }
+  if(!CLIENT_ID){ toast('Enter your Client ID first'); return; }
+  spin(true); const ok=await requestToken(true);
+  if(ok){ try{ await afterSignIn(); }catch(e){ toast('Error: '+e.message); } } else toast('Sign-in cancelled');
+  spin(false);
+}
+function signOut(){ if(accessToken&&window.google){ try{ google.accounts.oauth2.revoke(accessToken,()=>{}); }catch(e){} } accessToken=null; location.reload(); }
+
+/* ============================================================
+   DRIVE API (REST v3)
+   ============================================================ */
+async function dfetch(url,opts){
+  opts=opts||{}; opts.headers=Object.assign({Authorization:'Bearer '+accessToken},opts.headers||{});
+  let r=await fetch(url,opts);
+  if(r.status===401){ const ok=await requestToken(false); if(ok){ opts.headers.Authorization='Bearer '+accessToken; r=await fetch(url,opts); } }
+  if(!r.ok){ throw new Error('Drive '+r.status); }
+  return r;
+}
+async function driveList(q,fields){ const u='https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields='+encodeURIComponent(fields||'files(id,name,modifiedTime,mimeType)')+'&pageSize=200&spaces=drive'; return (await dfetch(u)).json(); }
+async function driveReadText(id){ return (await dfetch('https://www.googleapis.com/drive/v3/files/'+id+'?alt=media')).text(); }
+async function driveMeta(id){ return (await dfetch('https://www.googleapis.com/drive/v3/files/'+id+'?fields=id,name,modifiedTime')).json(); }
+async function driveUpdate(id,text){ return (await dfetch('https://www.googleapis.com/upload/drive/v3/files/'+id+'?uploadType=media&fields=id,modifiedTime',{method:'PATCH',headers:{'Content-Type':'application/json; charset=UTF-8'},body:text})).json(); }
+async function driveCreate(name,parentId,text,mime){
+  const boundary='pf'+Date.now(); const meta={name,parents:[parentId]};
+  const body='--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify(meta)+'\r\n--'+boundary+'\r\nContent-Type: '+(mime||'text/plain')+'\r\n\r\n'+text+'\r\n--'+boundary+'--';
+  return (await dfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+boundary},body})).json();
+}
+async function ensureChildFolder(parentId,name){
+  const r=await driveList("'"+parentId+"' in parents and name='"+name+"' and mimeType='application/vnd.google-apps.folder' and trashed=false",'files(id,name)');
+  if(r.files[0]) return r.files[0].id;
+  const meta={name,mimeType:'application/vnd.google-apps.folder',parents:[parentId]};
+  return (await dfetch('https://www.googleapis.com/drive/v3/files?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(meta)})).json().then(j=>j.id);
+}
+
+/* ---------------- portfolio + projects ---------------- */
+async function findPortfolio(){
+  const r=await driveList("mimeType='application/vnd.google-apps.folder' and name='"+PORTFOLIO_NAME.replace(/'/g,"\\'")+"' and trashed=false",'files(id,name)');
+  return r.files[0]||null;
+}
+async function scanProjects(){
+  projects=[]; if(!portfolioId) return;
+  const subs=await driveList("'"+portfolioId+"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",'files(id,name)');
+  for(const f of subs.files){
+    const pj=await driveList("'"+f.id+"' in parents and name='project.json' and trashed=false",'files(id,name,modifiedTime)');
+    if(pj.files[0]){
+      let isTpl=false, nm=f.name;
+      try{ const d=JSON.parse(await driveReadText(pj.files[0].id)); if(d&&d.meta){ isTpl=!!d.meta.isTemplate; nm=d.meta.name||f.name; } }catch(e){}
+      projects.push({key:f.id,name:nm,folderId:f.id,pjId:pj.files[0].id,modifiedTime:pj.files[0].modifiedTime,isTemplate:isTpl});
+    }
+  }
+  projects.sort((a,b)=>(a.isTemplate-b.isTemplate)||(a.name<b.name?-1:1));
+}
+async function afterSignIn(){
+  const pf=await findPortfolio();
+  if(!pf){ toast('No "'+PORTFOLIO_NAME+'" folder found in your Drive'); return; }
+  portfolioId=pf.id;
+  await scanProjects();
+  $('setup').classList.remove('show'); $('hdr').style.display='flex'; $('tabs').style.display='flex'; $('views').style.display='block';
+  renderProjPick();
+  const first=projects.find(p=>!p.isTemplate)||projects[0];
+  if(first) await loadProject(first); else toast('Portfolio has no projects yet — create one on the desktop first');
+}
+async function loadProject(p){
+  spin(true);
+  try{ const txt=await driveReadText(p.pjId); state=migrateProject(JSON.parse(txt)); activeProj=p; loadedModifiedTime=p.modifiedTime; renderAll(); toast('Loaded: '+(state.meta.name||p.name)); }
+  catch(e){ toast('Load failed: '+e.message); }
+  spin(false);
+}
+async function reloadActive(){ if(!activeProj) return; const m=await driveMeta(activeProj.pjId); activeProj.modifiedTime=m.modifiedTime; await loadProject(activeProj); }
+async function saveProject(){
+  if(!activeProj) return false;
+  spin(true);
+  try{
+    const m=await driveMeta(activeProj.pjId);
+    if(loadedModifiedTime && m.modifiedTime && m.modifiedTime!==loadedModifiedTime){
+      if(!confirm('This project changed on another device since you opened it.\n\nOK = overwrite with your changes\nCancel = reload the latest (you lose unsaved edits)')){ spin(false); await reloadActive(); return false; }
+    }
+    const res=await driveUpdate(activeProj.pjId,JSON.stringify(state,null,1));
+    loadedModifiedTime=res.modifiedTime||loadedModifiedTime; activeProj.modifiedTime=loadedModifiedTime;
+    savedFlash();
+    return true;
+  }catch(e){ toast('Save failed: '+e.message); return false; }
+  finally{ spin(false); }
+}
+async function appendMD(filename,text){
+  if(state.meta.isTemplate||!activeProj) return;
+  try{ const exId=await ensureChildFolder(activeProj.folderId,'Exports');
+    const f=(await driveList("'"+exId+"' in parents and name='"+filename+"' and trashed=false",'files(id)')).files[0];
+    if(!f){ await driveCreate(filename,exId,text,'text/markdown'); }
+    else { const old=await driveReadText(f.id); await driveUpdate(f.id,old+text); }
+  }catch(e){ /* logging is best-effort */ }
+}
+async function ensureLogHeader(filename,header){
+  if(state.meta.isTemplate||!activeProj) return;
+  try{ const exId=await ensureChildFolder(activeProj.folderId,'Exports');
+    const f=(await driveList("'"+exId+"' in parents and name='"+filename+"' and trashed=false",'files(id)')).files[0];
+    if(!f) await driveCreate(filename,exId,header,'text/markdown');
+  }catch(e){}
+}
+/* commit = save project.json then re-render */
+async function commit(desc){ logChange(desc); const ok=await saveProject(); renderAll(); return ok; }
+
+/* ---------------- shell: project picker, tabs, badges ---------------- */
+function renderProjPick(){
+  const sel=$('projPick'); sel.innerHTML='';
+  projects.forEach(p=>{ const o=document.createElement('option'); o.value=p.key; o.textContent=(p.isTemplate?'★ ':'')+p.name; if(activeProj&&p.key===activeProj.key) o.selected=true; sel.appendChild(o); });
+}
+function switchTab(name){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='v-'+name));
+}
+function updateBadges(){
+  $('bAct').textContent=(state.actions||[]).filter(a=>a.status!=='Closed').length;
+  $('bRisk').textContent=(state.risks||[]).filter(r=>!r.accepted).length;
+  $('bRfi').textContent=(state.rfis||[]).filter(r=>r.status==='Open').length;
+}
+function renderAll(){ renderProjPick(); updateBadges(); renderDeliv(); renderCalendar(); renderDash(); renderActions(); renderRisks(); renderRfis(); renderMinutes(); renderNotes(); }
+
+/* ---------------- form sheet helpers ---------------- */
+function openSheet(title,bodyHTML,footButtons){
+  $('sheetTitle').textContent=title; $('sheetBody').innerHTML=bodyHTML; const f=$('sheetFoot'); f.innerHTML='';
+  (footButtons||[]).forEach(b=>{ const btn=document.createElement('button'); btn.className='btn '+(b.cls||''); btn.style.flex='1'; btn.textContent=b.label; btn.onclick=b.onclick; f.appendChild(btn); });
+  $('sheet').classList.add('open');
+}
+function closeSheet(){ $('sheet').classList.remove('open'); }
+
+/* ---------------- boot ---------------- */
+function boot(){
+  $('cfgClient').value=CLIENT_ID; $('cfgPortfolio').value=PORTFOLIO_NAME;
+  $('btnSaveCfg').onclick=()=>{ CLIENT_ID=$('cfgClient').value.trim(); PORTFOLIO_NAME=$('cfgPortfolio').value.trim()||'ProjectFlow'; localStorage.setItem('pf_clientId',CLIENT_ID); localStorage.setItem('pf_portfolio',PORTFOLIO_NAME); tokenClient=null; $('signInHint').textContent=CLIENT_ID?'Ready — tap Sign in with Google.':'Enter settings above first.'; toast('Settings saved'); };
+  $('btnSignIn').onclick=signIn;
+  $('btnRefresh').onclick=reloadActive;
+  $('btnMenu').onclick=()=>{ if(confirm('Sign out? (You can also change settings after signing out.)')) signOut(); };
+  $('projPick').onchange=e=>{ const p=projects.find(x=>x.key===e.target.value); if(p) loadProject(p); };
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+  $('sheetClose').onclick=closeSheet;
+  $('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });
+  if(CLIENT_ID) $('signInHint').textContent='Ready — tap Sign in with Google.';
+}
+/* ============================================================
+   VIEWERS
+   ============================================================ */
+let delivRange='next', delivSort='default', delivSearch='';
+function sortDelivs(a){ const r={inprogress:0,notstarted:1,complete:2};
+  if(delivSort==='az') return a.slice().sort((x,y)=>(x.title||'').toLowerCase()<(y.title||'').toLowerCase()?-1:1);
+  if(delivSort==='status') return a.slice().sort((x,y)=>(r[x.status]-r[y.status])||((x.title||'').toLowerCase()<(y.title||'').toLowerCase()?-1:1));
+  return a; }
+async function cycleStatus(id){ const d=state.deliverables.find(x=>x.id===id); if(!d) return; const i=STATUS_ORDER.indexOf(d.status); d.status=STATUS_ORDER[(i+1)%3]; d.completedDate=d.status==='complete'?todayISO():''; await commit('Deliverable status: '+d.title+' → '+statusOf(d).label); }
+function renderDeliv(){
+  const box=$('v-deliv'); box.innerHTML='';
+  const head=document.createElement('div'); head.className='vhead'; head.innerHTML='<h2>Deliverables</h2>';
+  const add=document.createElement('button'); add.className='btn'; add.textContent='＋ Add'; add.onclick=()=>delivForm(null); head.appendChild(add); box.appendChild(head);
+  const ctrl=document.createElement('div'); ctrl.className='ctrl';
+  ctrl.innerHTML='<select id="dRange"><option value="next">Up to next milestone</option><option value="all">All milestones</option></select>'+
+    '<select id="dSort"><option value="default">Milestone order</option><option value="az">A–Z</option><option value="status">Status</option></select>'+
+    '<input id="dSearch" placeholder="Search…">';
+  box.appendChild(ctrl);
+  const list=document.createElement('div'); box.appendChild(list);
+  $('dRange').value=delivRange; $('dSort').value=delivSort; $('dSearch').value=delivSearch;
+  $('dRange').onchange=e=>{ delivRange=e.target.value; drawDeliv(list); };
+  $('dSort').onchange=e=>{ delivSort=e.target.value; drawDeliv(list); };
+  $('dSearch').oninput=e=>{ delivSearch=e.target.value; drawDeliv(list); };
+  drawDeliv(list);
+}
+function drawDeliv(list){
+  list.innerHTML=''; const s=state, t=todayISO(), nextDate=nextMilestoneDate(s), q=delivSearch.trim().toLowerCase();
+  const late=(s.deliverables||[]).filter(d=>d.status!=='complete').map(d=>({d,m:msById(s,d.msId)})).filter(x=>x.m&&x.m.date&&x.m.date<t);
+  if(late.length){ const lb=document.createElement('div'); lb.className='lateBanner'; lb.innerHTML='<h4>⚠ Late — '+late.length+' past milestone date</h4>';
+    late.sort((a,b)=>a.m.date<b.m.date?-1:1).forEach(x=>{ const r=document.createElement('div'); r.className='li'; r.textContent=x.d.title+' — '+x.m.name+' (due '+fmtD(x.m.date)+', '+statusOf(x.d).label+')'; r.onclick=()=>delivForm(x.d.id); lb.appendChild(r); }); list.appendChild(lb); }
+  const groups=sortedMilestones(s).concat((s.milestones||[]).filter(m=>!m.date)).concat([null]); let total=0;
+  groups.forEach(m=>{ const msId=m?m.id:''; if(m&&delivRange==='next'&&nextDate&&m.date&&m.date>nextDate) return;
+    let items=(s.deliverables||[]).filter(d=>(d.msId||'')===msId); if(q) items=items.filter(d=>((d.title||'')+' '+(d.desc||'')).toLowerCase().includes(q)); if(!items.length) return; total+=items.length;
+    const g=document.createElement('div'); g.className='msG';
+    const h=document.createElement('div'); h.className='msGh'; let dt=''; if(m&&m.date){ const dd=daysBetween(t,m.date); const c=dd<0?'past':(dd<=14?'soon':''); dt='<span class="dt '+c+'">'+fmtD(m.date)+'</span>'; }
+    const done=items.filter(d=>d.status==='complete').length;
+    h.innerHTML='<span class="nm">'+esc(m?m.name:'No milestone')+'</span>'+dt+'<span class="hint">'+done+'/'+items.length+'</span>'; g.appendChild(h);
+    const cats=s.categories||[]; [...cats.map(c=>c.id),''].forEach(cid=>{ let sub=items.filter(d=>(d.catId||'')===cid); if(!sub.length) return; sub=sortDelivs(sub); const cat=cats.find(c=>c.id===cid);
+      const ch=document.createElement('div'); ch.className='catSub'; ch.style.background=cat?cat.color:'#8A8A8A'; ch.textContent=cat?cat.name:'Uncategorised'; g.appendChild(ch);
+      sub.forEach(d=>g.appendChild(delivCard(d))); });
+    list.appendChild(g);
+  });
+  if(!total){ const e=document.createElement('div'); e.className='empty'; e.textContent=delivRange==='next'?'Nothing up to the next milestone — switch to All milestones.':'No deliverables.'; list.appendChild(e); }
+}
+function delivCard(d){
+  const st=statusOf(d); const m=msById(state,d.msId); const late=d.status!=='complete'&&m&&m.date&&m.date<todayISO();
+  const nAct=(state.actions||[]).filter(a=>a.delivId===d.id&&a.status!=='Closed').length;
+  const c=document.createElement('div'); c.className='card'; if(late) c.style.borderLeftColor='#C0392B';
+  c.innerHTML='<div class="mn"><div class="tt">'+(late?'<span class="lateTag">LATE</span> ':'')+esc(d.title)+'</div>'+(d.desc?'<div class="ds">'+esc(d.desc)+'</div>':'')+(nAct?'<div class="meta">⚑ '+nAct+' open action(s)</div>':'')+'</div>';
+  const p=document.createElement('button'); p.className='pill '+st.cls; p.textContent=st.label; p.onclick=ev=>{ ev.stopPropagation(); cycleStatus(d.id); }; c.appendChild(p);
+  c.onclick=()=>delivForm(d.id); return c;
+}
+function renderCalendar(){
+  const box=$('v-calendar'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Calendar</h2>'; box.appendChild(h);
+  const ms=sortedMilestones(state); if(!ms.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No milestones with dates.'; box.appendChild(e); return; }
+  const t=todayISO(); const wrap=document.createElement('div'); wrap.className='calRow';
+  ms.forEach(m=>{ const dv=(state.deliverables||[]).filter(d=>d.msId===m.id); const done=dv.filter(d=>d.status==='complete').length;
+    const row=document.createElement('div'); row.className='cm'+(m.date<t?' passed':'');
+    row.innerHTML='<span>'+esc(m.name)+' <span class="hint">('+done+'/'+dv.length+')</span></span><span class="d">'+fmtD(m.date)+'</span>';
+    row.onclick=()=>{ const lines=dv.length?dv.map(d=>'• '+d.title+' — '+statusOf(d).label).join('\n'):'No deliverables linked.'; alert(m.name+' — '+fmtD(m.date)+'\n\n'+lines); };
+    wrap.appendChild(row); });
+  box.appendChild(wrap);
+}
+function renderDash(){
+  const box=$('v-dash'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Dashboard</h2>'; box.appendChild(h);
+  const s=state, t=todayISO();
+  const openA=(s.actions||[]).filter(a=>a.status!=='Closed').length, openR=(s.risks||[]).filter(r=>!r.accepted).length, openF=(s.rfis||[]).filter(r=>r.status==='Open').length;
+  const dn=(s.deliverables||[]).length, dc=(s.deliverables||[]).filter(d=>d.status==='complete').length;
+  const late=(s.deliverables||[]).filter(d=>{ if(d.status==='complete') return false; const m=msById(s,d.msId); return m&&m.date&&m.date<t; }).length;
+  const grid=document.createElement('div'); grid.className='dgrid';
+  const card=(n,l,cls)=>'<div class="dc '+(cls||'')+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';
+  grid.innerHTML=card(openA,'Open actions',openA?'amber':'')+card(openR,'Open risks',openR?'red':'')+card(openF,'Open RFIs',openF?'amber':'')+card(dc+'/'+dn,'Deliverables done','dark')+card(late,'Late',late?'red':'');
+  box.appendChild(grid);
+  const N=21; const items=[];
+  (s.deliverables||[]).forEach(d=>{ if(d.status==='complete') return; const m=msById(s,d.msId); if(m&&m.date){ const dd=daysBetween(t,m.date); if(dd<=N) items.push({due:m.date,d:dd,type:'Deliverable',title:d.title}); } });
+  (s.actions||[]).forEach(a=>{ if(a.due&&a.status!=='Closed'){ const dd=daysBetween(t,a.due); if(dd<=N) items.push({due:a.due,d:dd,type:a.id,title:a.desc}); } });
+  (s.rfis||[]).forEach(r=>{ if(r.due&&r.status==='Open'){ const dd=daysBetween(t,r.due); if(dd<=N) items.push({due:r.due,d:dd,type:r.id,title:r.subject}); } });
+  items.sort((a,b)=>a.due<b.due?-1:1);
+  const hh=document.createElement('h2'); hh.style.cssText='font-size:16px;margin:8px 0 6px'; hh.textContent='Next 21 days'; box.appendChild(hh);
+  if(!items.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='Nothing due. 🎉'; box.appendChild(e); return; }
+  items.forEach(it=>{ const c=document.createElement('div'); c.className='card'; const chip=it.d<0?'<span class="due dueOver">OVERDUE '+(-it.d)+'d</span>':it.d===0?'<span class="due dueToday">TODAY</span>':'<span class="due dueSoon">in '+it.d+'d</span>';
+    c.innerHTML='<div class="mn"><div class="tt">'+esc(it.title)+'</div><div class="meta">'+esc(it.type)+' · '+fmtD(it.due)+'</div></div>'+chip; box.appendChild(c); });
+}
+function renderActions(){
+  const box=$('v-actions'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Actions</h2>'; const add=document.createElement('button'); add.className='btn'; add.textContent='＋ Add'; add.onclick=()=>actionForm(null); h.appendChild(add); box.appendChild(h);
+  const list=(state.actions||[]).filter(a=>a.status!=='Closed').slice().sort((a,b)=>a.id<b.id?-1:1);
+  if(!list.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No open actions.'; box.appendChild(e); }
+  list.forEach(a=>{ const cls=a.status==='In Progress'?'sProg':'sOpen'; const dl=a.delivId?(state.deliverables||[]).find(x=>x.id===a.delivId):null;
+    const c=document.createElement('div'); c.className='card'; c.onclick=()=>actionForm(a.id);
+    c.innerHTML='<div class="mn"><div class="tt">'+esc(a.id)+' · '+esc(a.owner||'—')+'</div><div class="ds">'+esc(a.desc)+'</div><div class="meta">'+(a.due?'due '+fmtD(a.due):'')+(dl?' · ↳ '+esc(dl.title):'')+'</div></div><span class="statusChip '+cls+'">'+esc(a.status)+'</span>'; box.appendChild(c); });
+}
+function renderRisks(){
+  const box=$('v-risks'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Risks</h2>'; const add=document.createElement('button'); add.className='btn'; add.textContent='＋ Add'; add.onclick=()=>riskForm(null); h.appendChild(add); box.appendChild(h);
+  const list=(state.risks||[]).filter(r=>!r.accepted).slice().sort((a,b)=>a.id<b.id?-1:1);
+  if(!list.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No open risks.'; box.appendChild(e); }
+  list.forEach(r=>{ const c=document.createElement('div'); c.className='card'; c.onclick=()=>riskForm(r.id); const tags=(r.tags||[]).map(t=>'<span class="rTag" style="background:'+riskTagColor(t)+'">'+esc(t)+'</span>').join('');
+    c.innerHTML='<div class="mn"><div class="tt">'+esc(r.id)+'</div><div class="ds">'+esc(r.desc)+'</div><div class="meta">'+tags+'</div></div>'; box.appendChild(c); });
+}
+function renderRfis(){
+  const box=$('v-rfis'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>RFIs</h2>'; const add=document.createElement('button'); add.className='btn'; add.textContent='＋ Add'; add.onclick=()=>rfiForm(null); h.appendChild(add); box.appendChild(h);
+  const list=(state.rfis||[]).filter(r=>r.status!=='Closed').slice().sort((a,b)=>a.id<b.id?-1:1);
+  if(!list.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No open RFIs.'; box.appendChild(e); }
+  list.forEach(r=>{ const cls=r.status==='Open'?'sOpen':(r.status==='Answered'?'sProg':'sClosed'); const overdue=r.status==='Open'&&r.due&&r.due<todayISO();
+    const c=document.createElement('div'); c.className='card'; c.onclick=()=>rfiForm(r.id);
+    c.innerHTML='<div class="mn"><div class="tt">'+esc(r.id)+' · '+esc(r.subject)+'</div><div class="meta">to '+esc(r.to||'—')+(r.due?' · req '+fmtD(r.due):'')+(overdue?' ⚠':'')+'</div></div><span class="statusChip '+cls+'">'+esc(r.status)+'</span>'; box.appendChild(c); });
+}
+function renderMinutes(){
+  const box=$('v-minutes'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Minutes</h2>'; const add=document.createElement('button'); add.className='btn'; add.textContent='＋ Add'; add.onclick=()=>minutesForm(null); h.appendChild(add); box.appendChild(h);
+  const list=(state.minutes||[]);
+  if(!list.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No minutes yet.'; box.appendChild(e); }
+  list.forEach(m=>{ const c=document.createElement('div'); c.className='card'; c.onclick=()=>minutesForm(m.id);
+    c.innerHTML='<div class="mn"><div class="tt">'+esc(m.title)+'</div><div class="meta">'+fmtD(m.date)+' · '+esc(m.attendees||'')+'</div></div>'; box.appendChild(c); });
+}
+function renderNotes(){
+  const box=$('v-notes'); box.innerHTML=''; const h=document.createElement('div'); h.className='vhead'; h.innerHTML='<h2>Notice</h2>';
+  const a1=document.createElement('button'); a1.className='btn'; a1.textContent='＋ Note'; a1.onclick=()=>noteForm(null,'note'); h.appendChild(a1);
+  const a2=document.createElement('button'); a2.className='btn sec'; a2.textContent='＋ Spec'; a2.onclick=()=>noteForm(null,'spec'); h.appendChild(a2); box.appendChild(h);
+  const list=(state.notes||[]).filter(n=>!n.done);
+  if(!list.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='No notes.'; box.appendChild(e); }
+  list.forEach(n=>{ const c=document.createElement('div'); c.className='card'; c.style.borderLeftColor=n.kind==='spec'?'#2E6F8E':(n.color||'#5DAE55'); c.onclick=()=>noteForm(n.id,n.kind);
+    c.innerHTML='<div class="mn"><div class="ds">'+(n.kind==='spec'?'<b style="color:#2E6F8E">SPEC</b> ':'')+esc(n.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')+'</div><div class="meta">'+esc(n.by||'')+' · '+fmtD(n.date)+'</div></div>'; box.appendChild(c); });
+}
+/* ============================================================
+   FORMS (write project.json + append MD logs)
+   ============================================================ */
+function segWire(id){ const seg=$(id); seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{ seg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }); }
+function segVal(id){ const on=$(id).querySelector('button.on'); return on?on.dataset.v:''; }
+
+/* deliverable */
+function delivForm(id){
+  const d=id?state.deliverables.find(x=>x.id===id):null; const cats=state.categories||[];
+  const ms=sortedMilestones(state).concat((state.milestones||[]).filter(m=>!m.date)); const defMs=d?d.msId:closestMilestone(state);
+  const body='<div class="fld"><label>Title</label><input id="f_title" value="'+(d?esc(d.title):'')+'"></div>'+
+    '<div class="fld"><label>Description</label><textarea id="f_desc">'+(d?esc(d.desc||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Category</label><select id="f_cat">'+cats.map(c=>'<option value="'+c.id+'" '+(d&&d.catId===c.id?'selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></div>'+
+    '<div class="fld"><label>Milestone</label><select id="f_ms"><option value="">— none —</option>'+ms.map(m=>'<option value="'+m.id+'" '+(defMs===m.id?'selected':'')+'>'+esc(m.name)+(m.date?' ('+fmtD(m.date)+')':'')+'</option>').join('')+'</select></div>'+
+    '<div class="fld"><label>Status</label><div class="seg" id="f_status">'+STATUS_ORDER.map(k=>'<button data-v="'+k+'" class="'+((d?d.status:'notstarted')===k?'on':'')+'">'+DSTATUS[k].label+'</button>').join('')+'</div></div>';
+  const foot=[{label:'Save',onclick:()=>saveDelivM(id)}]; if(d) foot.unshift({label:'Delete',cls:'sec',onclick:()=>delDeliv(id)});
+  openSheet(d?'Edit deliverable':'New deliverable',body,foot); segWire('f_status');
+}
+async function saveDelivM(id){
+  const title=$('f_title').value.trim(); if(!title){ toast('Title required'); return; }
+  const v={title,desc:$('f_desc').value.trim(),catId:$('f_cat').value,msId:$('f_ms').value,status:segVal('f_status')||'notstarted'};
+  if(id){ const d=state.deliverables.find(x=>x.id===id); Object.assign(d,v); d.completedDate=d.status==='complete'?(d.completedDate||todayISO()):''; }
+  else state.deliverables.push(Object.assign({id:uid(),completedDate:v.status==='complete'?todayISO():''},v));
+  closeSheet(); await commit((id?'Deliverable updated: ':'Deliverable added: ')+title);
+}
+function delDeliv(id){ if(!confirm('Delete this deliverable?')) return; state.deliverables=state.deliverables.filter(x=>x.id!==id); closeSheet(); commit('Deliverable deleted'); }
+
+/* action */
+function actionForm(id){
+  const a=id?state.actions.find(x=>x.id===id):null; const delivs=state.deliverables||[];
+  const body='<div class="fld row2"><div style="flex:1"><label>Date raised</label><input type="date" id="f_raised" value="'+(a?a.raised:todayISO())+'"></div><div style="flex:1"><label>Owner</label><input id="f_owner" value="'+(a?esc(a.owner||''):'')+'"></div></div>'+
+    '<div class="fld"><label>Description</label><textarea id="f_desc">'+(a?esc(a.desc||''):'')+'</textarea></div>'+
+    '<div class="fld row2"><div style="flex:1"><label>Due</label><input type="date" id="f_due" value="'+(a?a.due||'':'')+'"></div><div style="flex:1"><label>Status</label><select id="f_status"><option>Open</option><option>In Progress</option><option>Closed</option></select></div></div>'+
+    '<div class="fld"><label>Source</label><input id="f_source" value="'+(a?esc(a.source||''):'Manual')+'"></div>'+
+    '<div class="fld"><label>Link to deliverable</label><select id="f_deliv"><option value="">— none —</option>'+delivs.map(d=>'<option value="'+d.id+'" '+(a&&a.delivId===d.id?'selected':'')+'>'+esc(d.title)+'</option>').join('')+'</select></div>'+
+    '<div class="fld"><label>Closure notes</label><textarea id="f_notes">'+(a?esc(a.notes||''):'')+'</textarea></div>';
+  openSheet(a?'Edit '+a.id:'New action',body,[{label:'Save',onclick:()=>saveActionM(id)}]); if(a) $('f_status').value=a.status;
+}
+async function saveActionM(id){
+  const desc=$('f_desc').value.trim(); if(!desc){ toast('Description required'); return; } let a,ev;
+  if(id){ a=state.actions.find(x=>x.id===id); const wc=a.status==='Closed'; Object.assign(a,{raised:$('f_raised').value,owner:$('f_owner').value.trim(),desc,due:$('f_due').value,status:$('f_status').value,source:$('f_source').value.trim(),notes:$('f_notes').value.trim(),delivId:$('f_deliv').value}); if(a.status==='Closed'&&!wc)a.closed=todayISO(); if(a.status!=='Closed')a.closed=''; ev=a.status==='Closed'?'CLOSED':'UPDATED'; }
+  else { a={id:actionSeq(),raised:$('f_raised').value||todayISO(),owner:$('f_owner').value.trim(),desc,due:$('f_due').value,status:$('f_status').value,source:$('f_source').value.trim()||'Manual',notes:$('f_notes').value.trim(),delivId:$('f_deliv').value,closed:$('f_status').value==='Closed'?todayISO():''}; state.actions.push(a); ev='RAISED'; }
+  closeSheet(); await commit('Action '+a.id+' '+ev.toLowerCase()); await logAction(a,ev);
+}
+async function logAction(a,ev){ const md='\n---\n### '+a.id+' — '+ev+' ('+fmtD(todayISO())+' by '+userName()+')\n- **Action for:** '+(a.owner||'—')+'\n- **Raised:** '+fmtD(a.raised)+'  **Due:** '+fmtD(a.due)+'\n- **Source:** '+(a.source||'Manual')+'\n- **Status:** '+a.status+'\n- **Description:** '+a.desc+'\n'+(a.notes?'- **Closure notes:** '+a.notes+'\n':''); await ensureLogHeader('actions-log.md','# Action Log — '+state.meta.name+'\n*Append-only register. Generated by Project Flow.*\n'); await appendMD('actions-log.md',md); }
+
+/* risk */
+function riskForm(id){
+  const r=id?state.risks.find(x=>x.id===id):null;
+  const body='<div class="fld row2"><div style="flex:1"><label>Date raised</label><input type="date" id="f_raised" value="'+(r?r.raised:todayISO())+'"></div><div style="flex:1"><label>Highlighted by</label><input id="f_by" value="'+(r?esc(r.by||''):'')+'"></div></div>'+
+    '<div class="fld"><label>Risk description</label><textarea id="f_desc">'+(r?esc(r.desc||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Tags</label><div class="tagChecks" id="f_tags">'+RISK_TAGS.map(x=>'<label><input type="checkbox" value="'+x[0]+'" '+(r&&(r.tags||[]).includes(x[0])?'checked':'')+'>'+x[0]+'</label>').join('')+'</div></div>'+
+    '<div class="fld"><label>Mitigating factors</label><textarea id="f_mit">'+(r?esc(r.mitigation||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Actions arising (owner | description | due, one per line)</label><textarea id="f_arise" placeholder="K.D | Update programme | 2026-07-01"></textarea></div>'+
+    '<div class="fld"><label><input type="checkbox" id="f_acc" style="width:auto" '+(r&&r.accepted?'checked':'')+'> Mitigation accepted — close risk</label></div>';
+  openSheet(r?'Edit '+r.id:'New risk',body,[{label:'Save',onclick:()=>saveRiskM(id)}]);
+}
+async function saveRiskM(id){
+  const desc=$('f_desc').value.trim(); if(!desc){ toast('Description required'); return; }
+  const tags=[...$('f_tags').querySelectorAll('input:checked')].map(c=>c.value); let r,ev;
+  if(id){ r=state.risks.find(x=>x.id===id); const was=!!r.accepted; Object.assign(r,{raised:$('f_raised').value,by:$('f_by').value.trim(),desc,mitigation:$('f_mit').value.trim(),tags,accepted:$('f_acc').checked}); if(r.accepted&&!was)r.acceptedDate=todayISO(); if(!r.accepted)r.acceptedDate=''; ev=(r.accepted&&!was)?'ACCEPTED':'UPDATED'; }
+  else { r={id:riskSeq(),raised:$('f_raised').value||todayISO(),by:$('f_by').value.trim(),desc,mitigation:$('f_mit').value.trim(),tags,accepted:$('f_acc').checked,acceptedDate:$('f_acc').checked?todayISO():''}; state.risks.push(r); ev='RAISED'; }
+  const arising=[]; $('f_arise').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{ const p=line.split('|').map(s=>s.trim()); const a={id:actionSeq(),raised:todayISO(),owner:p[0]||'',desc:p[1]||p[0]||line,due:/^\d{4}-\d{2}-\d{2}$/.test(p[2]||'')?p[2]:'',status:'Open',source:r.id+' (risk)',notes:'',closed:'',delivId:''}; state.actions.push(a); arising.push(a); });
+  closeSheet(); await commit('Risk '+r.id+' '+ev.toLowerCase()+(arising.length?' (+'+arising.length+' actions)':''));
+  await logRisk(r,ev); for(const a of arising) await logAction(a,'RAISED');
+}
+async function logRisk(r,ev){ const md='\n---\n### '+r.id+' — '+ev+' ('+fmtD(todayISO())+' by '+userName()+')\n- **Highlighted by:** '+(r.by||'—')+'\n- **Raised:** '+fmtD(r.raised)+'\n- **Tags:** '+((r.tags||[]).join(', ')||'—')+'\n- **Risk:** '+r.desc+'\n'+(r.mitigation?'- **Mitigating factors:** '+r.mitigation+'\n':'')+(r.accepted?'- **Accepted:** '+fmtD(r.acceptedDate)+'\n':''); await ensureLogHeader('risks-log.md','# Risk Log — '+state.meta.name+'\n*Append-only register. Generated by Project Flow.*\n'); await appendMD('risks-log.md',md); }
+
+/* rfi */
+function rfiForm(id){
+  const r=id?state.rfis.find(x=>x.id===id):null;
+  const body='<div class="fld row2"><div style="flex:1"><label>Date raised</label><input type="date" id="f_raised" value="'+(r?r.raised:todayISO())+'"></div><div style="flex:1"><label>Raised by</label><input id="f_by" value="'+(r?esc(r.by||''):esc(state.meta.user||''))+'"></div></div>'+
+    '<div class="fld row2"><div style="flex:1"><label>Directed to</label><input id="f_to" value="'+(r?esc(r.to||''):'')+'"></div><div style="flex:1"><label>Required by</label><input type="date" id="f_due" value="'+(r?r.due||'':'')+'"></div></div>'+
+    '<div class="fld"><label>Subject</label><input id="f_subject" value="'+(r?esc(r.subject||''):'')+'"></div>'+
+    '<div class="fld"><label>Question</label><textarea id="f_desc">'+(r?esc(r.desc||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Status</label><select id="f_status"><option>Open</option><option>Answered</option><option>Closed</option></select></div>'+
+    '<div class="fld"><label>Response</label><textarea id="f_ans">'+(r?esc(r.answer||''):'')+'</textarea></div>';
+  openSheet(r?'Edit '+r.id:'New RFI',body,[{label:'Save',onclick:()=>saveRfiM(id)}]); if(r) $('f_status').value=r.status||'Open';
+}
+async function saveRfiM(id){
+  const subject=$('f_subject').value.trim(); if(!subject){ toast('Subject required'); return; }
+  const v={raised:$('f_raised').value||todayISO(),by:$('f_by').value.trim(),to:$('f_to').value.trim(),due:$('f_due').value,subject,desc:$('f_desc').value.trim(),status:$('f_status').value,answer:$('f_ans').value.trim()}; let r,ev;
+  if(id){ r=state.rfis.find(x=>x.id===id); const was=r.status; Object.assign(r,v); if(r.status!=='Open'&&was==='Open')r.answered=todayISO(); if(r.status==='Open')r.answered=''; ev=(r.status!==was)?r.status.toUpperCase():'UPDATED'; }
+  else { r=Object.assign({id:rfiSeq(),answered:v.status!=='Open'?todayISO():''},v); state.rfis.push(r); ev='RAISED'; }
+  closeSheet(); await commit('RFI '+r.id+' '+ev.toLowerCase());
+  const md='\n---\n### '+r.id+' — '+ev+' ('+fmtD(todayISO())+' by '+userName()+')\n- **Raised by:** '+(r.by||'—')+'  **Directed to:** '+(r.to||'—')+'\n- **Raised:** '+fmtD(r.raised)+'  **Required by:** '+fmtD(r.due)+'\n- **Status:** '+r.status+(r.answered?' ('+fmtD(r.answered)+')':'')+'\n- **Subject:** '+r.subject+'\n'+(r.desc?'- **Question:** '+r.desc+'\n':'')+(r.answer?'- **Response:** '+r.answer+'\n':'');
+  await ensureLogHeader('rfis-log.md','# RFI Log — '+state.meta.name+'\n*Append-only register. Generated by Project Flow.*\n'); await appendMD('rfis-log.md',md);
+}
+
+/* minutes */
+function minutesForm(id){
+  const m=id?state.minutes.find(x=>x.id===id):null;
+  const body='<div class="fld row2"><div style="flex:1"><label>Date</label><input type="date" id="f_date" value="'+(m?m.date:todayISO())+'"></div><div style="flex:1"><label>Title</label><input id="f_title" value="'+(m?esc(m.title||''):'')+'"></div></div>'+
+    '<div class="fld"><label>Attendees</label><input id="f_att" value="'+(m?esc(m.attendees||''):'')+'"></div>'+
+    '<div class="fld"><label>Discussion (one per line)</label><textarea id="f_items">'+(m?esc(m.items||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Decisions (one per line)</label><textarea id="f_dec">'+(m?esc(m.decisions||''):'')+'</textarea></div>'+
+    '<div class="fld"><label>Actions arising (owner | description | due, one per line)</label><textarea id="f_arise"></textarea></div>';
+  openSheet(m?'Edit minutes':'New minutes',body,[{label:'Save',onclick:()=>saveMinM(id)}]);
+}
+async function saveMinM(id){
+  const title=$('f_title').value.trim(); if(!title){ toast('Title required'); return; } let m;
+  if(id){ m=state.minutes.find(x=>x.id===id); Object.assign(m,{date:$('f_date').value||todayISO(),title,attendees:$('f_att').value.trim(),items:$('f_items').value.trim(),decisions:$('f_dec').value.trim()}); m.revised=todayISO(); }
+  else { m={id:uid(),date:$('f_date').value||todayISO(),title,attendees:$('f_att').value.trim(),items:$('f_items').value.trim(),decisions:$('f_dec').value.trim()}; state.minutes.unshift(m); }
+  const arising=[]; $('f_arise').value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{ const p=line.split('|').map(s=>s.trim()); const a={id:actionSeq(),raised:m.date,owner:p[0]||'',desc:p[1]||p[0]||line,due:/^\d{4}-\d{2}-\d{2}$/.test(p[2]||'')?p[2]:'',status:'Open',source:m.title+' ('+fmtD(m.date)+')',notes:'',closed:'',delivId:''}; state.actions.push(a); arising.push(a); });
+  if(arising.length) m.actionIds=(m.actionIds||[]).concat(arising.map(a=>a.id));
+  closeSheet(); await commit('Minutes saved: '+title+(arising.length?' (+'+arising.length+' actions)':''));
+  let md='\n---\n\n## '+(m.revised?'[REVISED] ':'')+m.title+' — '+fmtD(m.date)+'\n\n**Attendees:** '+(m.attendees||'—')+'\n';
+  if(m.items) md+='\n### Discussion\n'+m.items.split('\n').map(l=>'- '+l).join('\n')+'\n';
+  if(m.decisions) md+='\n### Decisions\n'+m.decisions.split('\n').map(l=>'- '+l).join('\n')+'\n';
+  if(arising.length) md+='\n### Actions arising\n'+arising.map(a=>'- **'+a.id+'** ('+(a.owner||'—')+(a.due?', due '+fmtD(a.due):'')+'): '+a.desc).join('\n')+'\n';
+  await ensureLogHeader('minutes-log.md','# Minutes Log — '+state.meta.name+'\n*Append-only record. Generated by Project Flow.*\n'); await appendMD('minutes-log.md',md);
+  for(const a of arising) await logAction(a,'RAISED');
+}
+
+/* note / spec */
+function noteForm(id,kind){
+  const n=id?state.notes.find(x=>x.id===id):null; kind=n?n.kind:(kind||'note'); const col=n?(n.color||NOTE_COLORS[0]):(kind==='spec'?'#D9EDF7':NOTE_COLORS[0]);
+  const body='<div class="fld"><label>'+(kind==='spec'?'Specification':'Note')+' text</label><textarea id="f_text" style="min-height:120px">'+(n?esc(n.text||''):'')+'</textarea><div class="hint">**double asterisks** = bold. Specs compile into status-log.md on the desktop.</div></div>'+
+    '<div class="fld"><label>Colour</label><div class="swRow" id="f_col">'+NOTE_COLORS.map(c=>'<div class="sw '+(c===col?'on':'')+'" data-c="'+c+'" style="background:'+c+'"></div>').join('')+'</div></div>'+
+    '<div class="fld"><label><input type="checkbox" id="f_done" style="width:auto" '+(n&&n.done?'checked':'')+'> Closed out</label></div>';
+  const foot=[{label:'Save',onclick:()=>saveNoteM(id,kind)}]; if(n) foot.unshift({label:'Delete',cls:'sec',onclick:()=>delNote(id)});
+  openSheet(kind==='spec'?'Specification':'Note',body,foot);
+  $('f_col').querySelectorAll('.sw').forEach(s=>s.onclick=()=>{ $('f_col').querySelectorAll('.sw').forEach(x=>x.classList.remove('on')); s.classList.add('on'); });
+}
+function colVal(){ const on=$('f_col').querySelector('.sw.on'); return on?on.dataset.c:NOTE_COLORS[0]; }
+async function saveNoteM(id,kind){
+  const text=$('f_text').value.trim(); if(!text){ toast('Text required'); return; } let n,ev;
+  if(id){ n=state.notes.find(x=>x.id===id); const was=!!n.done; Object.assign(n,{text,color:colVal(),done:$('f_done').checked}); if(n.done&&!was)n.doneDate=todayISO(); if(!n.done)n.doneDate=''; ev=(n.done&&!was)?'CLOSED OUT':'UPDATED'; }
+  else { n={id:uid(),kind,date:todayISO(),by:userName(),text,color:colVal(),done:$('f_done').checked,doneDate:$('f_done').checked?todayISO():''}; state.notes.unshift(n); ev='POSTED'; }
+  closeSheet(); await commit((kind==='spec'?'Spec ':'Note ')+ev.toLowerCase());
+  await ensureLogHeader('notes-log.md','# Notice Board Log — '+state.meta.name+'\n*Append-only. Generated by Project Flow.*\n');
+  await appendMD('notes-log.md','\n---\n### '+(kind==='spec'?'SPEC ':'')+ev+' — '+fmtD(todayISO())+' by '+userName()+'\n'+n.text.split('\n').map(l=>'> '+l).join('\n')+'\n');
+}
+function delNote(id){ if(!confirm('Delete this note?')) return; state.notes=state.notes.filter(x=>x.id!==id); closeSheet(); commit('Note deleted'); }
+
+boot();
+</script>
+</body>
+</html>
